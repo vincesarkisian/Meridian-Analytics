@@ -21,14 +21,15 @@ One row per role. "What to try" should tell a reviewer what to click to see this
 
 | Role | Email | Password | What to try while logged in as this user |
 | ---- | ----- | -------- | ---------------------------------------- |
-| **Admin** (Acme Corp) | vince.sarkisian@gmail.com | _(fill in)_ | `/members`: full management — invite, remove, change a member's role. `/account`: all three capabilities green. Home page: "Enterprise SSO (Acme)" routes to Acme's Test IdP. |
-| **Team lead** (Acme Corp) | _(to create, e.g. `vince+acme.lead@gmail.com`)_ | _(set on create)_ | `/members`: can invite/remove members. `/account`: "View" + "Invite and remove" green, "Change a member's access" ✗. |
-| **Compliance** (Acme Corp) | _(to create, e.g. `vince+acme.compliance@gmail.com`)_ | _(set on create)_ | `/members`: read-only notice, no management controls. `/account`: only "View the member list" green. |
-| **Admin** (Prospect — MFA + session demo) | vince.sarkisian1+2@gmail.com | _(fill in; authenticator app enrolled)_ | Sign-in requires **MFA**. `/account` shows org "Prospect". Session **expires ~10s** after sign-in → next click bounces you to sign-in (Requirement 5 firing). |
+| **Admin** — Vince Sarkisian (Acme Corp) | vince.sarkisian@gmail.com | `AEG8jmz*tna3mtf3fez` | `/members`: full management — invite, remove, change a member's role. `/account`: all three capabilities green. Home page: "Enterprise SSO (Acme)" routes to Acme's Test IdP. |
+| **Team lead** — Tyrion Lannister (Acme Corp) | vince.sarkisian1+1@gmail.com | `ryw_zvw_GBE_xen9thq` | `/members`: can invite/remove members. `/account`: "View" + "Invite and remove" green, "Change a member's access" ✗. |
+| **Compliance** — Rob Stark (Acme Corp) | vince.sarkisian1@gmail.com | `8Tyqk#B2LO^{;-D%` | `/members`: read-only notice, no management controls. `/account`: only "View the member list" green. |
+| **Prospect member** — John Snow (MFA + session demo) | vince.sarkisian1+2@gmail.com | `c0ttage48` (+ authenticator app enrolled) | Sign-in requires **MFA**. `/account` shows org "Prospect". Session **expires ~10s** after sign-in → next click bounces you to sign-in (Requirement 5 firing). |
 
-> To finish this table: create the **Team lead** and **Compliance** users (dashboard → Users,
-> or invite them via `/members` as the Acme admin), assign the `team-lead` / `compliance`
-> roles, set passwords, and fill the blanks above.
+> **MFA note:** John's authenticator factor is enrolled on the author's device, so a
+> reviewer will reach the **MFA challenge** (which itself confirms MFA is enforced on
+> Prospect) but can't complete it without the TOTP code — the full MFA + 10s-session flow is
+> shown in the demo video. The three **Acme** logins above are non-MFA and fully testable.
 
 ## 3. Requirement map
 
