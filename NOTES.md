@@ -266,3 +266,61 @@ deploy time, or the widget breaks in production.
 
 **Verified live (Turn 7):** `/members` shows the real members table — Vince Sarkisian,
 role Admin, "You" badge, working Search / role filter / Invite user. Requirement 2 done. ✅
+
+---
+
+## Turn 8 — 2026-08-30 — Step 5: SSO via the Test IdP (Requirement 4)
+
+**Design.** App uses AuthKit, so SSO is handled by the hosted flow — minimal app code.
+Rather than rely on email-domain routing (fiddly with the Test IdP's `example.com`
+domain), we add an explicit **organization-scoped** SSO entry point: passing
+`organizationId` to `getSignInUrl` routes AuthKit straight to Acme's authentication, which
+becomes the Test IdP once a connection exists. Password login is untouched (kept, per Vince).
+
+**Grounding.** Read `workos-sso.md` (mostly standalone-SSO SDK — not our AuthKit path) and
+fetched `docs/sso/test-sso` + `docs/sso/guide`. Confirmed from SDK types that
+`getSignInUrl({ organizationId })` is supported and forwards `organization_id` to the
+authorize URL. Staging ships a Test IdP (docs: "if it works with the Test IdP it works
+with any IdP").
+
+**Code.**
+- `src/app/login/sso/route.ts`: `getSignInUrl({ organizationId: DEMO_ACME_ORG_ID })` →
+  redirect. Route Handler (safe place for getSignInUrl / PKCE cookie). Safe before the
+  connection exists — falls back to Acme's normal auth.
+- `src/app/page.tsx`: "Enterprise SSO (Acme)" button on the signed-out home view.
+- `DEMO_ACME_ORG_ID` added to `.env.local` (+ documented in `.env.local.example`). Not a
+  secret — just the Acme org id for demo convenience.
+
+**Verification.** `tsc` clean. Restarted dev (env change). `/login/sso` →
+`authorize?...&organization_id=org_01M17EGW73PSFAYF93CMAE7M3C`; plain `/login` has no
+organization_id. Routing scoped correctly.
+
+**Dashboard (done by Vince):** Acme now has an **Active SSO connection via the Test IdP**
+(`conn_01M19E2K02ERRG03KA1VXDJV95`). Verified in the dashboard together, incl. a **Success**
+SAML session row for vince.sarkisian@gmail.com. Also spotted: an **Organization policy** on
+Acme with "SSO for domain members: Required" (this is the per-org enforcement surface we'll
+reuse for Req 5), and a pre-created **Prospect** org (`org_01M17F47QFPGVCZWK67Y0E3ABS`).
+
+**Verified (Turn 8):**
+- App entry point works: clicking **"Enterprise SSO (Acme)"** on the signed-out home →
+  `/login/sso` → org-scoped authorize → **Test Identity Provider** mock login. Confirmed
+  live in the browser pane.
+- Completed a Test IdP profile and returned through AuthKit to the app.
+
+**Wrinkle documented — email verification on SSO.** AuthKit email verification is ON, and
+neither `gmail.com` nor `acme.com` is a *verified domain* on Acme, so SSO profiles are
+treated as "guests" and hit a "Verify your email" code step. Production-correct fix:
+**verify Acme's real domain** → employees on that domain provision with no code. Alternative:
+disable email verification (also affects password sign-ups). Recorded as an SE decision for
+SUBMISSION. (`vince.sarkisian@gmail.com` is a real inbox, so the code path can be completed
+for the demo.)
+
+**Note / cleanup:** a `jordan.lee@acme.com` guest user may exist in a pending (unverified)
+state from a test run — harmless; can be removed from the Users list.
+
+**API quirk noted:** `workos.sso.listConnections({ organizationId })` returned 0 for Acme
+even though the dashboard shows the connection Active — the app never calls this, so no
+functional impact; flagged only so we don't trust that call as ground truth.
+
+**Requirement 4 — proven.** SSO connection Active (Test IdP), app routes to it end-to-end,
+successful SAML session recorded. ✅ (Password login untouched, per Vince.)
