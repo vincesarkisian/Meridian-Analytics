@@ -26,8 +26,12 @@ One row per requirement as you understood them from the brief. Your enumeration 
 
 | Scenario requirement | Where it's addressed (route / file / dashboard surface) | Notes on your interpretation |
 | -------------------- | ------------------------------------------------------- | ---------------------------- |
-|                      |                                                          |                              |
-|                      |                                                          |                              |
+| 1. Each customer is a walled-off workspace; zero cross-tenant visibility | WorkOS **Organizations** (dashboard) + `withAuth().organizationId` surfaced in `src/app/account/page.tsx`. Isolation is enforced by the org-scoped session server-side. | Tenant = WorkOS Organization. Acme Corp = `org_01M17EGW73PSFAYF93CMAE7M3C`. |
+| 3. Three user kinds: admins, team leads, compliance (read-only) | WorkOS **environment-level Roles & Permissions** (dashboard) + `src/lib/permissions.ts` (`can()` helper) + capabilities panel in `src/app/account/page.tsx`. Gated on permissions, never role slugs. | Roles: `admin` (read/write/manage_roles), `team-lead` (read/write), `compliance` (read). "Team lead looks after their own people" = a capability tier; true per-team scoping is app-layer, not RBAC. |
+| 2. Self-serve member management (invite / remove / change access) — no support ticket | _Planned: Step 4 — WorkOS User Management widgets._ | — |
+| 4. Acme employees sign in via their own Okta ("no Okta, no deal") | _Planned: Step 5 — WorkOS SSO via the sanctioned Test Identity Provider._ | — |
+| 5. 24h session expiry + admin MFA for one customer only | _Planned: Step 6 — per-organization authentication policy._ | — |
+| Bonus: Slack `#customer-success` ping on seat changes | _Optional: WorkOS Pipes._ | Explicitly "down the road" in the brief. |
 
 ## 4. Decision log
 

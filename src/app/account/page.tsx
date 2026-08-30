@@ -1,5 +1,6 @@
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Text, Heading, TextField, Flex, Box } from "@radix-ui/themes";
+import { PERMISSIONS, can } from "@/lib/permissions";
 
 export default async function AccountPage() {
   const { user, role, permissions, organizationId } = await withAuth({
@@ -15,6 +16,15 @@ export default async function AccountPage() {
     permissions ? ["Permissions", permissions] : [],
     ["Id", user?.id],
   ].filter((arr) => arr.length > 0);
+
+  // Requirement 3: what this session can do, derived from its permissions.
+  // Each row reflects a real permission, so admin / team-lead / compliance
+  // sessions visibly differ here.
+  const capabilities = [
+    [PERMISSIONS.MEMBERS_READ, "View the member list"],
+    [PERMISSIONS.MEMBERS_WRITE, "Invite and remove members"],
+    [PERMISSIONS.MEMBERS_MANAGE_ROLES, "Change a member's access"],
+  ] as const;
 
   return (
     <>
@@ -44,6 +54,18 @@ export default async function AccountPage() {
           ))}
         </Flex>
       )}
+
+      <Flex direction="column" gap="2" mt="7" width="400px">
+        <Heading size="4">What you can do here</Heading>
+        {capabilities.map(([permission, label]) => {
+          const allowed = can(permissions, permission);
+          return (
+            <Text key={permission} size="3" color={allowed ? "green" : "gray"}>
+              {allowed ? "✓" : "✕"} {label}
+            </Text>
+          );
+        })}
+      </Flex>
     </>
   );
 }

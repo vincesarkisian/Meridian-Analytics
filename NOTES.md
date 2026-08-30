@@ -151,3 +151,61 @@ add that user as a member of Acme. Then sign in → expect `organizationId = org
 **Design note for later:** Acme's scenario needs SSO via Okta (Req 4) while SUBMISSION asks
 for password logins per role. Resolve the credential story in Steps 3–4; for now one
 password user in Acme is enough to prove tenant scoping.
+
+---
+
+## Turn 5 — 2026-08-30 — Commit & push Requirement 1
+
+Branched off `main` (never commit straight to default) → `req-1-organizations`. Two clean
+commits for reviewability:
+1. `chore: project scaffolding` — WorkOS skills (`.agents/`, `skills-lock.json`),
+   `.claude/launch.json`, `CLAUDE.md`, `NOTES.md`, updated `package-lock.json`.
+2. `feat(account): surface organizationId to demonstrate tenant scoping` — the R1 code.
+
+Reverted an unintended `package.json` change (npm had auto-added a `packageManager` pin to
+the local npm build hash, which could break CI). `.env.local` stayed ignored — no secrets
+committed. Pushed to `origin` (github.com/vincesarkisian/Meridian-Analytics).
+
+**Still open:** live sign-in verification of R1 was paused at the AuthKit password step
+(Claude does not type passwords). Once signed in, confirm `/account` shows
+`Organization = org_01M17EGW73PSFAYF93CMAE7M3C`. Acme Corp id recorded.
+
+**R1 verified by Vince (Turn 6):** org ID shows on the account page. ✅
+
+---
+
+## Turn 6 — 2026-08-30 — Step 3: Roles & Permissions (Requirement 3)
+
+**Grounding.** Read `references/workos-rbac.md`. Two rules adopted:
+1. Gate on **permissions**, never role slugs (slug checks break with custom/multi-org roles).
+2. Use **environment-level** roles (IdP→role mapping needs them; org-level roles isolate
+   the org irreversibly).
+
+**Role design (interpretation — brief invites it).** Three permission slugs cleanly
+separate the three roles, and since code checks permissions (not names), role names stay
+cosmetic/renamable:
+- `members:read` — view members
+- `members:write` — invite/remove members
+- `members:manage_roles` — change a member's access
+
+| Role | slug | permissions | brief mapping |
+|------|------|-------------|---------------|
+| Administrator | `admin` | read, write, manage_roles | "run the workspace" incl. change access |
+| Team Lead | `team-lead` | read, write | "look after their own people" |
+| Compliance | `compliance` | read | "see everything, change nothing" |
+
+*Interpretation recorded:* true "own people" scoping is resource-level (app logic), not
+RBAC. RBAC grants workspace-wide capability tiers; per-team filtering is an app-layer
+add-on. Stated in SUBMISSION.
+
+**Code.**
+- New `src/lib/permissions.ts`: `PERMISSIONS` constants + `can(permissions, perm)` helper
+  (single source of truth for slugs; "missing array = denied"). Uses `@/*` alias.
+- `src/app/account/page.tsx`: added a "What you can do here" panel — maps each permission
+  to a label and renders ✓/✕ via `can()`. Makes role differences visible in the demo.
+- Verified: `npx tsc --noEmit` clean; no dev-server compile errors. Live authenticated
+  render deferred until roles assigned + re-auth (in-app browser has no session).
+
+**Dashboard (Vince):** create the 3 permissions + 3 roles at the environment level; assign
+`admin` to vince.sarkisian@gmail.com; re-authenticate (role changes need re-login). Then
+`/account` should show Role=admin and all capabilities green.
