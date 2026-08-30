@@ -1,7 +1,25 @@
+import type { ReactNode } from "react";
 import { withAuth, getWorkOS } from "@workos-inc/authkit-nextjs";
-import { Text, Heading, TextField, Flex, Box } from "@radix-ui/themes";
 import { PERMISSIONS, can } from "@/lib/permissions";
 import { AccountProfile } from "./account-profile";
+
+function Field({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "120px 1fr",
+        gap: 16,
+        alignItems: "baseline",
+      }}
+    >
+      <dt className="metric-name">{label}</dt>
+      <dd style={{ margin: 0, fontSize: 14, color: "var(--text-200)" }}>
+        {value}
+      </dd>
+    </div>
+  );
+}
 
 export default async function AccountPage() {
   const { user, role, permissions, organizationId } = await withAuth({
@@ -10,7 +28,6 @@ export default async function AccountPage() {
 
   // Mint a token for the User Profile widget (no permission scope required), and
   // look up the organization's display name — the session only carries its id.
-  // Both need an org-scoped session.
   let profileToken: string | null = null;
   let organizationName: string | null = null;
   if (organizationId) {
@@ -30,20 +47,11 @@ export default async function AccountPage() {
     }
   }
 
-  const userFields = [
-    ["First name", user?.firstName],
-    ["Last name", user?.lastName],
-    ["Email", user?.email],
-    // Show the friendly org name; fall back to the id if the lookup failed.
-    organizationId ? ["Organization", organizationName ?? organizationId] : [],
-    role ? ["Role", role] : [],
-    permissions ? ["Permissions", permissions] : [],
-    ["Id", user?.id],
-  ].filter((arr) => arr.length > 0);
+  const displayName =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+  const workspace = organizationName ?? organizationId ?? null;
 
   // Requirement 3: what this session can do, derived from its permissions.
-  // Each row reflects a real permission, so admin / team-lead / compliance
-  // sessions visibly differ here.
   const capabilities = [
     [PERMISSIONS.MEMBERS_READ, "View the member list"],
     [PERMISSIONS.MEMBERS_WRITE, "Invite and remove members"],
@@ -51,52 +59,135 @@ export default async function AccountPage() {
   ] as const;
 
   return (
-    <>
-      <Flex direction="column" gap="2" mb="7">
-        <Heading size="8" align="center">
-          Account details
-        </Heading>
-        <Text size="5" align="center" color="gray">
-          Below are your account details
-        </Text>
-      </Flex>
+    <div>
+      <div className="page-head">
+        <div className="eyebrow">Account</div>
+        <h1>{displayName}</h1>
+        <p>
+          Your identity, role, and access{workspace ? ` in ${workspace}` : ""}.
+        </p>
+      </div>
 
-      {userFields && (
-        <Flex direction="column" justify="center" gap="3" width="400px">
-          {userFields.map(([label, value]) => (
-            <Flex asChild align="center" gap="6" key={String(value)}>
-              <label>
-                <Text weight="bold" size="3" style={{ width: 100 }}>
-                  {label}
-                </Text>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: 16,
+          alignItems: "start",
+          maxWidth: 920,
+        }}
+      >
+        {/* Identity */}
+        <div className="brand-card" style={{ padding: "26px 28px" }}>
+          <div className="eyebrow" style={{ marginBottom: 20 }}>
+            Identity
+          </div>
+          <dl style={{ margin: 0, display: "grid", gap: 16 }}>
+            <Field label="Name" value={displayName} />
+            <Field label="Email" value={user.email} />
+            {workspace && <Field label="Organization" value={workspace} />}
+            <Field
+              label="Role"
+              value={<span className="pill pill-ok">{role ?? "member"}</span>}
+            />
+            <Field
+              label="User ID"
+              value={
+                <span
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 12,
+                    color: "var(--slate-400)",
+                  }}
+                >
+                  {user.id}
+                </span>
+              }
+            />
+          </dl>
+        </div>
 
-                <Box flexGrow="1">
-                  <TextField.Root value={String(value) || ""} readOnly />
-                </Box>
-              </label>
-            </Flex>
-          ))}
-        </Flex>
-      )}
-
-      <Flex direction="column" gap="2" mt="7" width="400px">
-        <Heading size="4">What you can do here</Heading>
-        {capabilities.map(([permission, label]) => {
-          const allowed = can(permissions, permission);
-          return (
-            <Text key={permission} size="3" color={allowed ? "green" : "gray"}>
-              {allowed ? "✓" : "✕"} {label}
-            </Text>
-          );
-        })}
-      </Flex>
+        {/* Access */}
+        <div className="brand-card" style={{ padding: "26px 28px" }}>
+          <div className="eyebrow" style={{ marginBottom: 6 }}>
+            Access
+          </div>
+          <p
+            className="lead"
+            style={{ fontSize: 13.5, marginBottom: 12, maxWidth: 380 }}
+          >
+            What this role can do{workspace ? ` in ${workspace}` : ""} — derived
+            from your permissions, never a hardcoded role name.
+          </p>
+          <div style={{ display: "grid", gap: 0 }}>
+            {capabilities.map(([permission, label]) => {
+              const allowed = can(permissions, permission);
+              return (
+                <div
+                  key={permission}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "12px 0",
+                    borderTop: "1px solid var(--line-800)",
+                  }}
+                >
+                  <span
+                    style={{ display: "flex", alignItems: "center", gap: 12 }}
+                  >
+                    <span
+                      className="audit-dot"
+                      style={{
+                        background: allowed
+                          ? "var(--status-ok)"
+                          : "var(--line-750)",
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 14,
+                        color: allowed ? "var(--text-200)" : "var(--slate-500)",
+                      }}
+                    >
+                      {label}
+                    </span>
+                  </span>
+                  <span className={allowed ? "pill pill-ok" : "pill pill-neutral"}>
+                    {allowed ? "allowed" : "denied"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          {permissions && permissions.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <div className="eyebrow" style={{ marginBottom: 10 }}>
+                Permissions
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {permissions.map((p) => (
+                  <span key={p} className="pill pill-neutral">
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {profileToken && (
-        <Flex direction="column" gap="3" mt="7" width="480px" maxWidth="100%">
-          <Heading size="4">Manage your profile</Heading>
-          <AccountProfile authToken={profileToken} />
-        </Flex>
+        <div style={{ marginTop: 44, maxWidth: 920 }}>
+          <div className="section-header">
+            <span className="num">03</span>
+            <h2>Manage your profile</h2>
+          </div>
+          <div className="brand-card" style={{ padding: 10 }}>
+            <AccountProfile authToken={profileToken} />
+          </div>
+        </div>
       )}
-    </>
+    </div>
   );
 }

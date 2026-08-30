@@ -1,0 +1,341 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+/* Meridian Analytics brand tokens (from the brand kit). Dark is default. */
+:root {
+  --deep-900: #06231a;
+  --forest-700: #0d4a32;
+  --forest-fill: #1d5a3e;
+  --meridian-500: #157f52;
+  --signal-400: #2ca86e;
+  --mint-300: #6adba3;
+  --mint-200: #a7efc8;
+
+  --ink-900: #07090a;
+  --surface-800: #0d1112;
+  --surface-750: #101617;
+  --line-700: #1e2426;
+  --line-750: #232a2b;
+  --line-800: #171c1d;
+  --chip-fill: #14191a;
+
+  --text-100: #f3f7f4;
+  --text-200: #e8edea;
+  --text-300: #d8e0db;
+  --slate-400: #8a978f;
+  --slate-450: #93a099;
+  --slate-500: #6c7a74;
+  --border-quiet: #2e3a35;
+  --ink-on-green: #04150d;
+
+  --status-ok: #2ca86e;
+  --status-warn: #e3a55c;
+  --status-error: #e07a6b;
+}
+
+html,
+body {
+  background: var(--ink-900);
+  padding: 0;
+  margin: 0;
+}
+body {
+  color: var(--text-200);
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Point Radix Themes at the brand fonts + ground color. */
+.radix-themes {
+  --default-font-family: "Instrument Sans", system-ui, sans-serif;
+  --heading-font-family: "Sora", system-ui, sans-serif;
+  --code-font-family: "IBM Plex Mono", ui-monospace, monospace;
+  --color-background: var(--ink-900);
+}
+
+a {
+  color: var(--mint-300);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--mint-200);
+}
+::selection {
+  background: var(--meridian-500);
+  color: #fff;
+}
+
+/* ---- App shell ---- */
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--ink-900);
+  border-bottom: 1px solid var(--line-700);
+}
+.app-nav-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.nav-links {
+  display: flex;
+  gap: 2px;
+}
+.nav-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--slate-400);
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: color 150ms ease, background 150ms ease;
+}
+.nav-link:hover {
+  color: var(--text-200);
+  background: var(--surface-800);
+}
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 48px 40px 96px;
+}
+.org-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 20px;
+  border-left: 1px solid var(--line-700);
+}
+.org-chip .label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slate-500);
+}
+.org-chip .name {
+  font-family: "Sora", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-100);
+}
+
+/* ---- Type helpers ---- */
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--slate-500);
+}
+.eyebrow-green {
+  color: var(--mint-300);
+}
+.display {
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--text-100);
+  line-height: 1.04;
+  text-wrap: pretty;
+  margin: 0;
+}
+.lead {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--slate-450);
+  text-wrap: pretty;
+  margin: 0;
+}
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.section-header .num {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--meridian-500);
+}
+.section-header h2 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  color: var(--text-100);
+}
+
+/* ---- Cards ---- */
+.brand-card {
+  background: var(--surface-800);
+  border: 1px solid var(--line-700);
+  border-radius: 14px;
+}
+
+/* ---- Metric card (signature pattern) ---- */
+.metric-card {
+  background: var(--surface-750);
+  border: 1px solid var(--line-750);
+  border-radius: 12px;
+  padding: 22px 24px;
+}
+.metric-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  color: var(--slate-400);
+  letter-spacing: 0.08em;
+}
+.metric-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 14px 0;
+}
+.metric-value {
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  font-size: 34px;
+  letter-spacing: -0.03em;
+  color: var(--text-100);
+  line-height: 1;
+}
+.metric-delta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mint-300);
+}
+.metric-delta.down {
+  color: var(--status-error);
+}
+.sparkline {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  height: 40px;
+}
+.spark-bar {
+  flex: 1;
+  border-radius: 2px;
+  background: var(--forest-fill);
+}
+
+/* ---- Audit row (signature pattern) ---- */
+.audit-row {
+  display: grid;
+  grid-template-columns: 92px 16px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-800);
+}
+.audit-time {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: var(--slate-500);
+}
+.audit-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+}
+.audit-text {
+  font-size: 14px;
+  color: var(--text-300);
+}
+.audit-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  color: var(--slate-400);
+  background: var(--chip-fill);
+  border: 1px solid var(--line-750);
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* ---- Status pills ---- */
+.pill {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 4px 11px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.pill-ok {
+  color: var(--mint-300);
+  background: rgba(44, 168, 110, 0.12);
+  border-color: rgba(44, 168, 110, 0.35);
+}
+.pill-neutral {
+  color: var(--slate-400);
+  background: var(--chip-fill);
+  border-color: var(--line-750);
+}
+.pill-warn {
+  color: var(--status-warn);
+  background: rgba(227, 165, 92, 0.1);
+  border-color: rgba(227, 165, 92, 0.3);
+}
+.pill-error {
+  color: var(--status-error);
+  background: rgba(224, 122, 107, 0.1);
+  border-color: rgba(224, 122, 107, 0.3);
+}
+
+/* ---- Buttons (non-Radix, for the brand surfaces) ---- */
+.btn {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 11px 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn-primary {
+  color: var(--ink-on-green);
+  background: var(--signal-400);
+}
+.btn-primary:hover {
+  background: var(--mint-300);
+  color: var(--ink-on-green);
+}
+.btn-secondary {
+  color: var(--text-200);
+  background: transparent;
+  border-color: var(--border-quiet);
+}
+.btn-secondary:hover {
+  border-color: var(--signal-400);
+  color: var(--mint-300);
+}
+
+/* ---- Page header used on Account / Members ---- */
+.page-head {
+  margin-bottom: 32px;
+}
+.page-head h1 {
+  margin: 8px 0 0;
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  font-size: 34px;
+  letter-spacing: -0.02em;
+  color: var(--text-100);
+}
+.page-head p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: var(--slate-450);
+}

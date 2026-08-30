@@ -1,21 +1,23 @@
-// Import the base CSS styles for the radix-ui components.
+// Base CSS for the Radix components, then the WorkOS widgets, then our brand layer.
 import "@radix-ui/themes/styles.css";
-// Styles for the WorkOS widgets (User Management, etc.).
 import "@workos-inc/widgets/styles.css";
+import "./brand.css";
 
 import type { Metadata } from "next";
 import NextLink from "next/link";
-import { Theme, Card, Container, Flex, Button, Box } from "@radix-ui/themes";
+import { Theme } from "@radix-ui/themes";
 import { Footer } from "./components/footer";
 import { SignInButton } from "./components/sign-in-button";
+import { MeridianLockup } from "./components/logo";
 import {
   AuthKitProvider,
   Impersonation,
 } from "@workos-inc/authkit-nextjs/components";
 
 export const metadata: Metadata = {
-  title: "Example AuthKit Authenticated App",
-  description: "Example Next.js application demonstrating how to use AuthKit.",
+  title: "Meridian Analytics",
+  description:
+    "Governed analytics. Answers you can hand to an examiner. Multi-tenant demo on WorkOS AuthKit.",
 };
 
 export default function RootLayout({
@@ -25,48 +27,45 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ padding: 0, margin: 0 }}>
+      <body>
         <Theme
-          accentColor="iris"
+          appearance="dark"
+          accentColor="jade"
+          grayColor="sage"
           panelBackground="solid"
-          style={{ backgroundColor: "var(--gray-1)" }}
+          radius="medium"
+          style={{ background: "var(--ink-900)", minHeight: "100vh" }}
         >
           <AuthKitProvider>
             <Impersonation />
-            <Container style={{ backgroundColor: "var(--gray-1)" }}>
-              <Flex direction="column" gap="5" p="5" height="100vh">
-                <Box asChild flexGrow="1">
-                  <Card size="4">
-                    <Flex direction="column" height="100%">
-                      <Flex asChild justify="between">
-                        <header>
-                          <Flex gap="4">
-                            <Button asChild variant="soft">
-                              <NextLink href="/">Home</NextLink>
-                            </Button>
 
-                            <Button asChild variant="soft">
-                              <NextLink href="/account">Account</NextLink>
-                            </Button>
+            <header className="app-nav">
+              <div className="app-nav-inner">
+                <NextLink href="/" aria-label="Meridian Analytics home">
+                  <MeridianLockup />
+                </NextLink>
 
-                            <Button asChild variant="soft">
-                              <NextLink href="/members">Members</NextLink>
-                            </Button>
-                          </Flex>
+                <nav className="nav-links" style={{ marginLeft: 12 }}>
+                  <NextLink className="nav-link" href="/">
+                    Overview
+                  </NextLink>
+                  <NextLink className="nav-link" href="/members">
+                    Members
+                  </NextLink>
+                  <NextLink className="nav-link" href="/account">
+                    Account
+                  </NextLink>
+                </nav>
 
-                          <SignInButton />
-                        </header>
-                      </Flex>
+                <div style={{ marginLeft: "auto" }}>
+                  <SignInButton />
+                </div>
+              </div>
+            </header>
 
-                      <Flex flexGrow="1" align="center" justify="center">
-                        <main>{children}</main>
-                      </Flex>
-                    </Flex>
-                  </Card>
-                </Box>
-                <Footer />
-              </Flex>
-            </Container>
+            <main className="container">{children}</main>
+
+            <Footer />
           </AuthKitProvider>
         </Theme>
       </body>

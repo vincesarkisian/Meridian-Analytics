@@ -1,40 +1,68 @@
-import { Card, Grid, Heading, Text } from "@radix-ui/themes";
+import { MeridianMark } from "./logo";
 
 export function Footer() {
   return (
-    <Grid columns={{ initial: "1", sm: "3" }} gap={{ initial: "3", sm: "5" }}>
-      <Card size="4" asChild variant="classic">
-        <a href="https://workos.com/docs" rel="noreferrer" target="_blank">
-          <Heading size="4" mb="1">
+    <footer style={{ borderTop: "1px solid var(--line-700)" }}>
+      <div
+        style={{
+          maxWidth: 1120,
+          margin: "0 auto",
+          padding: "32px 40px 48px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 24,
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <MeridianMark size={24} />
+          <span
+            style={{
+              fontFamily: "'Sora', sans-serif",
+              fontWeight: 600,
+              fontSize: 17,
+              letterSpacing: "-0.03em",
+              color: "var(--text-200)",
+            }}
+          >
+            meridian
+          </span>
+          <span
+            className="lead"
+            style={{ fontSize: 14, marginLeft: 12, maxWidth: 360 }}
+          >
+            Governed analytics on a WorkOS-powered, multi-tenant foundation.
+          </span>
+        </div>
+
+        <div style={{ display: "flex", gap: 24, fontSize: 14, fontWeight: 600 }}>
+          <a href="https://workos.com/docs" rel="noreferrer" target="_blank">
             Documentation
-          </Heading>
-          <Text color="gray">
-            View integration guides and SDK documentation.
-          </Text>
-        </a>
-      </Card>
-      <Card size="4" asChild variant="classic">
-        <a
-          href="https://workos.com/docs/reference"
-          rel="noreferrer"
-          target="_blank"
-        >
-          <Heading size="4" mb="1">
+          </a>
+          <a
+            href="https://workos.com/docs/reference"
+            rel="noreferrer"
+            target="_blank"
+          >
             API Reference
-          </Heading>
-          <Text color="gray">
-            Every WorkOS API method and endpoint documented.
-          </Text>
-        </a>
-      </Card>
-      <Card size="4" asChild variant="classic">
-        <a href="https://workos.com" rel="noreferrer" target="_blank">
-          <Heading size="4" mb="1">
+          </a>
+          <a href="https://workos.com" rel="noreferrer" target="_blank">
             WorkOS
-          </Heading>
-          <Text color="gray">Learn more about other WorkOS products.</Text>
-        </a>
-      </Card>
-    </Grid>
+          </a>
+        </div>
+      </div>
+      <div
+        style={{
+          maxWidth: 1120,
+          margin: "0 auto",
+          padding: "0 40px 40px",
+        }}
+      >
+        <span className="eyebrow" style={{ textTransform: "none" }}>
+          © 2026 Meridian Analytics · demo workspace on WorkOS AuthKit
+        </span>
+      </div>
+    </footer>
   );
 }

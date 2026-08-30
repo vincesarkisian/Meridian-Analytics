@@ -1,5 +1,5 @@
 import { withAuth, getWorkOS } from "@workos-inc/authkit-nextjs";
-import { Flex, Heading, Text, Callout } from "@radix-ui/themes";
+import { Flex, Callout } from "@radix-ui/themes";
 import { PERMISSIONS, can } from "@/lib/permissions";
 import { MembersWidget } from "./members-widget";
 import { MembersReadonlyList } from "./members-readonly-list";
@@ -30,12 +30,11 @@ export default async function MembersPage() {
   }
 
   const header = (
-    <Flex direction="column" gap="2" mb="6" align="center">
-      <Heading size="8">Members</Heading>
-      <Text size="4" color="gray">
-        Manage who has access to {organizationName ?? "your workspace"}
-      </Text>
-    </Flex>
+    <div className="page-head">
+      <div className="eyebrow">Members</div>
+      <h1>{organizationName ?? "Your workspace"}</h1>
+      <p>Manage who has access to {organizationName ?? "your workspace"}.</p>
+    </div>
   );
 
   // A session must be scoped to an organization to manage that org's members.

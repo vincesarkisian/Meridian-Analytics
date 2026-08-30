@@ -1,13 +1,12 @@
 "use client";
 
 /**
- * Header auth control. When signed out it's a "Sign In" button; when signed in it
- * shows the user's avatar + name next to Sign Out. Uses the AuthKit `useAuth` hook
- * (the idiomatic way to read the session client-side) — WorkOS widgets cover full
- * self-service panels (UserProfile, UserSecurity, ...), not a compact header chip.
+ * Header auth control. Signed out → a primary "Sign in" button; signed in → the
+ * user's avatar + name next to a secondary "Sign out". Styled with the brand
+ * system. Uses the AuthKit `useAuth` hook to read the session client-side.
  */
 
-import { Avatar, Button, Flex, Text } from "@radix-ui/themes";
+import { Avatar } from "@radix-ui/themes";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import { handleSignOutAction } from "../actions/signOut";
 
@@ -15,7 +14,11 @@ export function SignInButton({ large }: { large?: boolean }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <span className="eyebrow" style={{ color: "var(--slate-500)" }}>
+        …
+      </span>
+    );
   }
 
   if (user) {
@@ -27,28 +30,43 @@ export function SignInButton({ large }: { large?: boolean }) {
       "?";
 
     return (
-      <Flex align="center" gap="3">
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
         <Avatar
           size="2"
           radius="full"
+          color="jade"
           src={user.profilePictureUrl ?? undefined}
           fallback={initials}
         />
-        <Text size="2" weight="medium">
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 500,
+            color: "var(--text-200)",
+          }}
+        >
           {name}
-        </Text>
+        </span>
         <form action={handleSignOutAction}>
-          <Button type="submit" variant="soft" size={large ? "3" : "2"}>
-            Sign Out
-          </Button>
+          <button
+            type="submit"
+            className="btn btn-secondary"
+            style={{ padding: "8px 16px" }}
+          >
+            Sign out
+          </button>
         </form>
-      </Flex>
+      </span>
     );
   }
 
   return (
-    <Button asChild size={large ? "3" : "2"}>
-      <a href="/login">Sign In {large && "with AuthKit"}</a>
-    </Button>
+    <a
+      className={large ? "btn btn-primary" : "btn btn-primary"}
+      href="/login"
+      style={large ? undefined : { padding: "9px 18px" }}
+    >
+      Sign in
+    </a>
   );
 }

@@ -8,9 +8,18 @@
  */
 import { WorkOsWidgets, UserProfile } from "@workos-inc/widgets";
 
+const widgetTheme = {
+  appearance: "dark",
+  accentColor: "jade",
+  grayColor: "sage",
+  radius: "medium",
+  panelBackground: "solid",
+  fontFamily: "'Instrument Sans', system-ui, sans-serif",
+} as const;
+
 export function AccountProfile({ authToken }: { authToken: string }) {
   return (
-    <WorkOsWidgets>
+    <WorkOsWidgets theme={widgetTheme}>
       <UserProfile authToken={authToken} />
     </WorkOsWidgets>
   );

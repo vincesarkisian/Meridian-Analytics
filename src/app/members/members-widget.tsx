@@ -11,9 +11,19 @@
  */
 import { WorkOsWidgets, UsersManagement } from "@workos-inc/widgets";
 
+// Match the widget chrome to the Meridian brand (dark, jade accent).
+const widgetTheme = {
+  appearance: "dark",
+  accentColor: "jade",
+  grayColor: "sage",
+  radius: "medium",
+  panelBackground: "solid",
+  fontFamily: "'Instrument Sans', system-ui, sans-serif",
+} as const;
+
 export function MembersWidget({ authToken }: { authToken: string }) {
   return (
-    <WorkOsWidgets>
+    <WorkOsWidgets theme={widgetTheme}>
       <UsersManagement authToken={authToken} />
     </WorkOsWidgets>
   );
