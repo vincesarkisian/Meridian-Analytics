@@ -375,3 +375,30 @@ an observed refresh-token re-establishment; reasoned + tsc/build clean.)
 - **Org name, not id:** `/account` "Organization" field and `/members` header now show the
   org's display name (via `getWorkOS().organizations.getOrganization()`), falling back to
   the id. Verified live: shows "Prospect" for John, "Acme Corp" for Acme sessions.
+
+---
+
+## Turn 11 — 2026-08-30 — Deploy to Vercel
+
+- Merged `req-1-organizations` → `main` (fast-forward) and pushed; Vercel deploys prod from
+  `main`.
+- Imported the repo on Vercel (project `meridian-analytics`, team VinceOS/Hobby, Next.js
+  auto-detected). Pasted `.env.local` for the env vars. First deploy assigned the domain
+  **https://meridian-analytics-chi.vercel.app** (plain name was taken → `-chi`).
+- Fixed the redirect-URI chicken-and-egg: updated `NEXT_PUBLIC_WORKOS_REDIRECT_URI` to the
+  prod callback and **redeployed** (it's build-time inlined).
+- WorkOS dashboard (Applications → Meridian Analytics): added the prod **redirect URI**
+  (kept localhost), set the **App homepage URL** to prod, and added the prod **CORS origin**
+  (Sessions tab). Noted: env-wide "Maximum session length" is **365 days** — confirms our
+  per-org 24h is app-enforced on top.
+- **Verified live on prod:** app renders; "Sign In with AuthKit" completes the round-trip
+  (prod redirect URI works); and the **Prospect 10s session expiry fired on production**
+  (John signed out on navigation) — Requirement 5 enforced on the deployed app. ✅
+- Decision (Vince): keep the 10s Prospect window on prod so reviewers see the policy fire;
+  documented in SUBMISSION.
+- Not yet visually confirmed on prod: widget data-load (CORS) — config is identical to the
+  working localhost origin, so high-confidence; John's 10s timeout made a live check awkward.
+  Verify with a persistent Acme login if desired.
+
+Deliverables so far: **deployed URL ✓**, **repo ✓** (SUBMISSION §1). Remaining: finish
+SUBMISSION (test creds, decision log, pushback, cut list), demo video, optional Pipes bonus.

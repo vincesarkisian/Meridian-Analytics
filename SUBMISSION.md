@@ -6,9 +6,14 @@ Fill in every section and commit this file to your repo. Reviewers work from thi
 
 Deployed URL, repo, and demo video.
 
-- **Deployed app**:
-- **Repo**:
-- **Video**:
+- **Deployed app**: https://meridian-analytics-chi.vercel.app
+- **Repo**: https://github.com/vincesarkisian/Meridian-Analytics
+- **Video**: _(pending)_
+
+> Note: the deployed **Prospect** org enforces a **10-second** session limit
+> (`PROSPECT_SESSION_MAX_SECONDS=10`) so a reviewer signing in as the Prospect admin
+> sees Requirement 5's per-org session policy fire live. Every other org uses the
+> normal session. The default in code is 24h.
 
 ## 2. Test credentials
 
