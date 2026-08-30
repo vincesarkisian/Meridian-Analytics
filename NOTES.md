@@ -402,3 +402,28 @@ an observed refresh-token re-establishment; reasoned + tsc/build clean.)
 
 Deliverables so far: **deployed URL ✓**, **repo ✓** (SUBMISSION §1). Remaining: finish
 SUBMISSION (test creds, decision log, pushback, cut list), demo video, optional Pipes bonus.
+
+---
+
+## Turn 12 — 2026-08-30 — SUBMISSION completion + compliance read-only roster
+
+- **Test credentials** completed from the WorkOS DB (read-only API pull): Acme `admin`
+  Vince Sarkisian, `team-lead` Tyrion Lannister (`+1`), `compliance` Rob Stark (`1@`),
+  Prospect member John Snow (`+2`, MFA). Passwords added (dummy review app, per Vince).
+  Noted John's MFA is on the author's device (reviewers hit the challenge = enforcement
+  proof; full flow in the video).
+- **Verified role permissions via API** (`listOrganizationRoles`): admin =
+  read/write/manage_roles/widgets, team-lead = read/write/widgets, compliance = read only.
+  Confirms the demo behaviour per role without logging in. (Note: `widgets.getToken` with the
+  users-table scope succeeded for all three in staging, but our app gates on the custom
+  `members:write`, so compliance still gets the read-only path.)
+- **Compliance read-only roster (cut-list #2 → done).** The manage widget needs
+  `widgets:users-table:manage`; compliance only has `members:read`, so built a
+  server-rendered read-only table instead: `src/app/members/members-readonly-list.tsx`
+  (lists memberships + user details from the WorkOS API server-side; no controls).
+  `src/app/members/page.tsx` now routes three tiers: `members:write` → manage widget,
+  `members:read` → read-only roster, neither → no-access notice.
+  **Verified live** as Rob Stark: sees all three Acme members (roster with role + status),
+  no management controls. `tsc` + `npm run build` clean.
+- SUBMISSION updated: creds table, requirement-map row 3, cut list (removed the two done
+  items).

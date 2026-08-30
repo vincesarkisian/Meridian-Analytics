@@ -2,6 +2,7 @@ import { withAuth, getWorkOS } from "@workos-inc/authkit-nextjs";
 import { Flex, Heading, Text, Callout } from "@radix-ui/themes";
 import { PERMISSIONS, can } from "@/lib/permissions";
 import { MembersWidget } from "./members-widget";
+import { MembersReadonlyList } from "./members-readonly-list";
 
 /**
  * Requirement 2: self-serve member management.
@@ -52,17 +53,35 @@ export default async function MembersPage() {
     );
   }
 
-  // Read-only roles (e.g. Compliance) can reach this page but cannot manage.
-  if (!can(permissions, PERMISSIONS.MEMBERS_WRITE)) {
+  const canManage = can(permissions, PERMISSIONS.MEMBERS_WRITE);
+  const canRead = can(permissions, PERMISSIONS.MEMBERS_READ);
+
+  // No membership permissions at all (e.g. the default member role).
+  if (!canManage && !canRead) {
     return (
       <Flex direction="column" width="500px">
         {header}
         <Callout.Root color="gray">
           <Callout.Text>
-            You have read-only access. Only admins and team leads can invite,
-            remove, or change members.
+            You don&apos;t have access to this workspace&apos;s members.
           </Callout.Text>
         </Callout.Root>
+      </Flex>
+    );
+  }
+
+  // Read-only roles (Compliance): see the full roster, no management controls.
+  if (!canManage && canRead) {
+    return (
+      <Flex direction="column" width="640px" maxWidth="100%">
+        {header}
+        <Callout.Root color="gray" mb="4">
+          <Callout.Text>
+            Read-only view — you can see everyone in the workspace but can&apos;t
+            invite, remove, or change members.
+          </Callout.Text>
+        </Callout.Root>
+        <MembersReadonlyList organizationId={organizationId} />
       </Flex>
     );
   }
