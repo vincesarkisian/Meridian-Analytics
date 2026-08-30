@@ -2,12 +2,15 @@ import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Text, Heading, TextField, Flex, Box } from "@radix-ui/themes";
 
 export default async function AccountPage() {
-  const { user, role, permissions } = await withAuth({ ensureSignedIn: true });
+  const { user, role, permissions, organizationId } = await withAuth({
+    ensureSignedIn: true,
+  });
 
   const userFields = [
     ["First name", user?.firstName],
     ["Last name", user?.lastName],
     ["Email", user?.email],
+    organizationId ? ["Organization", organizationId] : [],
     role ? ["Role", role] : [],
     permissions ? ["Permissions", permissions] : [],
     ["Id", user?.id],
