@@ -1,17 +1,41 @@
-import { withAuth } from "@workos-inc/authkit-nextjs";
+import { withAuth, getWorkOS } from "@workos-inc/authkit-nextjs";
 import { Text, Heading, TextField, Flex, Box } from "@radix-ui/themes";
 import { PERMISSIONS, can } from "@/lib/permissions";
+import { AccountProfile } from "./account-profile";
 
 export default async function AccountPage() {
   const { user, role, permissions, organizationId } = await withAuth({
     ensureSignedIn: true,
   });
 
+  // Mint a token for the User Profile widget (no permission scope required), and
+  // look up the organization's display name — the session only carries its id.
+  // Both need an org-scoped session.
+  let profileToken: string | null = null;
+  let organizationName: string | null = null;
+  if (organizationId) {
+    try {
+      profileToken = await getWorkOS().widgets.getToken({
+        organizationId,
+        userId: user.id,
+      });
+    } catch {
+      profileToken = null;
+    }
+    try {
+      const org = await getWorkOS().organizations.getOrganization(organizationId);
+      organizationName = org.name;
+    } catch {
+      organizationName = null;
+    }
+  }
+
   const userFields = [
     ["First name", user?.firstName],
     ["Last name", user?.lastName],
     ["Email", user?.email],
-    organizationId ? ["Organization", organizationId] : [],
+    // Show the friendly org name; fall back to the id if the lookup failed.
+    organizationId ? ["Organization", organizationName ?? organizationId] : [],
     role ? ["Role", role] : [],
     permissions ? ["Permissions", permissions] : [],
     ["Id", user?.id],
@@ -66,6 +90,13 @@ export default async function AccountPage() {
           );
         })}
       </Flex>
+
+      {profileToken && (
+        <Flex direction="column" gap="3" mt="7" width="480px" maxWidth="100%">
+          <Heading size="4">Manage your profile</Heading>
+          <AccountProfile authToken={profileToken} />
+        </Flex>
+      )}
     </>
   );
 }

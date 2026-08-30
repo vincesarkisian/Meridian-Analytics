@@ -324,3 +324,54 @@ functional impact; flagged only so we don't trust that call as ground truth.
 
 **Requirement 4 — proven.** SSO connection Active (Test IdP), app routes to it end-to-end,
 successful SAML session recorded. ✅ (Password login untouched, per Vince.)
+
+---
+
+## Turn 9 — 2026-08-30 — Step 6: per-org session + MFA policy (Requirement 5)
+
+**Key finding.** WorkOS per-org **authentication policy** (dashboard → org → Edit policy)
+supports **MFA** ("Require non-SSO members to be enrolled in MFA") but **not** session
+length. Session duration (max length / inactivity) is **environment-wide** (Applications →
+Sessions), confirmed in docs and by the policy dialog only offering SSO + MFA toggles. So
+"24h for one customer only" is not a native per-org toggle.
+
+**Decisions (SE calls).**
+- **MFA (native):** enabled "Require non-SSO members ... MFA" on the **Prospect** org.
+  Targets non-SSO members (SSO users' MFA is the IdP's job — matches the MFA skill note).
+  It's org-wide for non-SSO members, a superset of "admins", which satisfies the brief.
+- **24h session (app-level, chosen by Vince):** enforce in our own app so it's truly
+  Prospect-only. Other orgs untouched.
+
+**Code.**
+- `src/lib/session-policy.ts`: `SESSION_STARTED_COOKIE`, `PROSPECT_ORG_ID` (env),
+  `PROSPECT_MAX_SESSION_MS` (24h default, overridable via `PROSPECT_SESSION_MAX_MINUTES`
+  to demo expiry fast), and pure `isProspectSessionExpired(orgId, startedAtRaw)`.
+- `src/app/callback/route.ts`: `handleAuth({ onSuccess })` stamps sign-in time in a cookie.
+- `src/middleware.ts`: switched from `authkitMiddleware()` to the `authkit` +
+  `handleAuthkitHeaders` composable; if the session is Prospect and older than the max, it
+  clears the AuthKit session cookies and redirects to `/`. Keeps the marker (a fresh
+  sign-in overwrites it) so a surviving refresh token stays enforced rather than
+  un-enforced. `DEMO_PROSPECT_ORG_ID` added to env.
+
+**Verified live.** Signed in as a Prospect admin (John Snow, `vince.sarkisian1+2@gmail.com`),
+**MFA enrolled** via authenticator app (Vince). Shrank the window to ~60ms and reloaded a
+protected page → middleware signed John out to the signed-out home. ✅ Normal auth for
+non-Prospect orgs is unaffected (build + smoke test). Restored the window to 24h.
+(Hardening — keep marker + explicit cookie clear — added after the live logout test based on
+an observed refresh-token re-establishment; reasoned + tsc/build clean.)
+
+**Requirement 5 — done.** MFA (native per-org) + 24h session (app-enforced, Prospect-only). ✅
+
+---
+
+## Turn 10 — 2026-08-30 — UX polish (Vince requests)
+
+- **Header identity:** `src/app/components/sign-in-button.tsx` now shows the signed-in
+  user's avatar + name next to Sign Out (via `useAuth()`). No WorkOS widget provides a
+  compact header chip; the self-service widgets are full panels.
+- **UserProfile widget:** added `src/app/account/account-profile.tsx` + wired into
+  `/account` ("Manage your profile") with a no-scope widget token. Lets a user edit their
+  own name/email (which then flows to the header). Uses a WorkOS widget as requested.
+- **Org name, not id:** `/account` "Organization" field and `/members` header now show the
+  org's display name (via `getWorkOS().organizations.getOrganization()`), falling back to
+  the id. Verified live: shows "Prospect" for John, "Acme Corp" for Acme sessions.

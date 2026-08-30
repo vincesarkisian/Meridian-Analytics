@@ -17,11 +17,22 @@ export default async function MembersPage() {
     ensureSignedIn: true,
   });
 
+  // Look up the org's display name so the header names the workspace.
+  let organizationName: string | null = null;
+  if (organizationId) {
+    try {
+      const org = await getWorkOS().organizations.getOrganization(organizationId);
+      organizationName = org.name;
+    } catch {
+      organizationName = null;
+    }
+  }
+
   const header = (
     <Flex direction="column" gap="2" mb="6" align="center">
       <Heading size="8">Members</Heading>
       <Text size="4" color="gray">
-        Manage who has access to your workspace
+        Manage who has access to {organizationName ?? "your workspace"}
       </Text>
     </Flex>
   );
