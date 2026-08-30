@@ -1,5 +1,7 @@
 // Import the base CSS styles for the radix-ui components.
 import "@radix-ui/themes/styles.css";
+// Styles for the WorkOS widgets (User Management, etc.).
+import "@workos-inc/widgets/styles.css";
 
 import type { Metadata } from "next";
 import NextLink from "next/link";
@@ -45,6 +47,10 @@ export default function RootLayout({
 
                             <Button asChild variant="soft">
                               <NextLink href="/account">Account</NextLink>
+                            </Button>
+
+                            <Button asChild variant="soft">
+                              <NextLink href="/members">Members</NextLink>
                             </Button>
                           </Flex>
 

@@ -209,3 +209,60 @@ add-on. Stated in SUBMISSION.
 **Dashboard (Vince):** create the 3 permissions + 3 roles at the environment level; assign
 `admin` to vince.sarkisian@gmail.com; re-authenticate (role changes need re-login). Then
 `/account` should show Role=admin and all capabilities green.
+
+**Verified by Vince:** re-signed in, capabilities show green for admin. ✅
+
+---
+
+## Turn 7 — 2026-08-30 — Step 4: self-serve member management (Requirement 2)
+
+**Grounding.** Read `workos-widgets` skill: SKILL.md, framework-nextjs, token-strategies,
+widget-user-management, styling. Inspected the installed packages to use exact APIs rather
+than guessing:
+- `@workos-inc/widgets` 1.17.1 → exports `WorkOsWidgets` (provider, self-contained
+  react-query) and `UsersManagement` (`authToken: string | () => Promise<string>`).
+- Peers: `@radix-ui/themes ^3.3.0` (npm auto-bumped 3.2.1→3.3.0), `@tanstack/react-query`
+  (installed). `swr` is a peer but only used by the widget's *experimental* API — the
+  standard components use react-query, so we skip swr (its install hit an unrelated E404
+  for a private `@internal/typescript-config` devDep leak; avoided by not installing it).
+- Token: `getWorkOS().widgets.getToken({ organizationId, userId, scopes })` → `Promise<string>`.
+  Scope for this widget: `widgets:users-table:manage`. `getWorkOS` is a public export of
+  authkit-nextjs, so we reuse the already-configured SDK client (no new WorkOS instance).
+- Widget CSS: `@workos-inc/widgets/styles.css` (resolves to dist/css/styles.css).
+
+**The security story (answers the brief's "call the API from the frontend" question).**
+Token is minted server-side, scoped to user + org + a single permission, short-lived
+(1h). The secret API key never leaves the server; the browser only receives the scoped
+token. This is the concrete reason not to ship the API key to the frontend → SUBMISSION §5.
+
+**Code.**
+- `src/app/members/members-widget.tsx` (client): `<WorkOsWidgets><UsersManagement
+  authToken=.../></WorkOsWidgets>`. Receives only the serializable token.
+- `src/app/members/page.tsx` (server): `withAuth` → gate on `MEMBERS_WRITE`; states for
+  no-org (amber), read-only/compliance (gray), token failure (red, names the missing
+  widget permission), success (render widget). Mints token with the users-table scope.
+- `src/middleware.ts`: added `/members/:path*` to the matcher (else withAuth errs).
+- `src/app/layout.tsx`: import widget CSS; add "Members" nav link.
+
+**Verification.** `npx tsc --noEmit` clean. `npm run build` succeeds — `/members` compiles
+(37.9 kB widget bundle), all 10 routes generate, CSS + client/server boundary OK. Dev
+server restarted to pick up new deps; `/members` protects + redirects correctly.
+
+**Pending (Vince):** add the built-in **`widgets:users-table:manage`** permission to the
+`admin` role (and `team-lead` if they should manage), then re-authenticate. Then `/members`
+renders the live members table with invite/remove/change-role. Without that permission,
+`getToken` throws and the page shows the red "role needs widgets:users-table:manage" state.
+
+**Debug — CORS (resolved).** After re-auth, the widget mounted but rows stuck loading.
+Console showed the real cause: the widget calls `api.workos.com/_widgets/...` *directly
+from the browser*, and WorkOS returned no `Access-Control-Allow-Origin` for
+`http://localhost:3000` → CORS block. Our code was correct (token minted, widget mounted);
+the origin just wasn't allowlisted. Diagnosed via the in-app browser console/network (no
+server error; the failing calls were client→api.workos.com). **Fix:** add
+`http://localhost:3000` as a CORS origin in the WorkOS dashboard (CLI equivalent:
+`workos config cors add http://localhost:3000`). Applies immediately, no re-auth.
+**Deploy note:** must also add the Vercel URL as a CORS origin (and a redirect URI) at
+deploy time, or the widget breaks in production.
+
+**Verified live (Turn 7):** `/members` shows the real members table — Vince Sarkisian,
+role Admin, "You" badge, working Search / role filter / Invite user. Requirement 2 done. ✅
