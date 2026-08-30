@@ -19,12 +19,13 @@ export const SESSION_STARTED_COOKIE = "meridian_session_started_at";
 export const PROSPECT_ORG_ID = process.env.DEMO_PROSPECT_ORG_ID;
 
 /**
- * Max session age for the Prospect org. Defaults to 24h, but is overridable via
- * PROSPECT_SESSION_MAX_MINUTES so the expiry can be demoed in a couple of minutes
- * instead of waiting a full day.
+ * Max session age for the Prospect org. Defaults to 24h. For a live demo, set
+ * PROSPECT_SESSION_MAX_SECONDS (e.g. 10) to make the expiry easy to show without
+ * waiting a full day; it takes precedence over the default when > 0.
  */
-const maxMinutes = Number(process.env.PROSPECT_SESSION_MAX_MINUTES) || 24 * 60;
-export const PROSPECT_MAX_SESSION_MS = maxMinutes * 60 * 1000;
+const demoSeconds = Number(process.env.PROSPECT_SESSION_MAX_SECONDS);
+export const PROSPECT_MAX_SESSION_MS =
+  demoSeconds > 0 ? demoSeconds * 1000 : 24 * 60 * 60 * 1000;
 
 /**
  * True when a session belongs to the Prospect org and is older than the allowed
