@@ -24,7 +24,7 @@ One row per role. "What to try" should tell a reviewer what to click to see this
 | **Admin** — Vince Sarkisian (Acme Corp) | vince.sarkisian@gmail.com | `AEG8jmz*tna3mtf3fez` | `/members`: full management — invite, remove, change a member's role. `/account`: all three capabilities green. Home page: "Enterprise SSO (Acme)" routes to Acme's Test IdP. |
 | **Team lead** — Tyrion Lannister (Acme Corp) | vince.sarkisian1+1@gmail.com | `ryw_zvw_GBE_xen9thq` | `/members`: can invite/remove members. `/account`: "View" + "Invite and remove" green, "Change a member's access" ✗. |
 | **Compliance** — Rob Stark (Acme Corp) | vince.sarkisian1@gmail.com | `8Tyqk#B2LO^{;-D%` | `/members`: **read-only roster of the whole workspace** (sees every member, role, and status; no controls anywhere). `/account`: only "View the member list" green. |
-| **Prospect member** — John Snow (MFA + session demo) | vince.sarkisian1+2@gmail.com | `c0ttage48` (+ authenticator app enrolled) | Sign-in requires **MFA**. `/account` shows org "Prospect". Session **expires ~10s** after sign-in → next click bounces you to sign-in (Requirement 5 firing). |
+| **Prospect admin** — John Snow (MFA + session demo) | vince.sarkisian1+2@gmail.com | `c0ttage48` (+ authenticator app enrolled) | Sign-in requires **MFA**. `/account` shows org "Prospect". Session **expires ~10s** after sign-in → next click bounces you to sign-in (Requirement 5 firing). |
 
 > **MFA note:** John's authenticator factor is enrolled on the author's device, so a
 > reviewer will reach the **MFA challenge** (which itself confirms MFA is enforced on
@@ -102,10 +102,20 @@ _(Draft — personalize before submitting. A full turn-by-turn log lives in `NOT
   instead, and I'd tell the customer plainly: MFA-per-org is native today; per-org session
   length is not, so it's app-enforced (or a feature request to WorkOS).
 
-- **"Admins have to sign in with MFA."** The WorkOS org policy enforces MFA for **all
-  non-SSO members**, not a specific role. That's a superset (admins are covered), but if the
-  customer wants MFA for admins *only*, that's not a native per-role toggle — it'd need
-  app-level logic or IdP-side enforcement. Worth confirming their intent.
+- **"Admins have to sign in with MFA."** We chose the **org-wide** MFA policy on Prospect
+  (native, WorkOS's hosted MFA UI). It requires MFA for **all non-SSO members** — a superset
+  of "admins", so admins are covered. If the customer insists on **admins only**, be direct:
+  WorkOS can't do that with its built-in MFA. We confirmed this by building it —
+  - the hosted MFA screen is triggered **only** by the org-wide policy (no per-role/per-user
+    hook),
+  - authentication **Actions can only Allow/Deny** — they can't launch an MFA challenge, and
+  - so admin-only MFA means calling the **MFA API and hand-rolling your own challenge UI**.
+
+  We built that app-level role-scoped version (MFA API + a custom `/mfa` screen, admin +
+  Prospect only) and it worked — but it trades WorkOS's polished hosted UX for a screen we
+  maintain, and it double-prompts if the org policy is also on. The honest SE call for this
+  engagement: ship the native org-wide policy (covers the requirement), and treat true
+  admin-only MFA as a scoped follow-up or a feature request to WorkOS.
 
 - **Acme's SSO rollout.** For real Acme employees (not the Test IdP), verify Acme's domain
   in WorkOS so users provision through SSO without the guest **email-verification** step.
