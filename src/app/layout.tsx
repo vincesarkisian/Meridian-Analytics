@@ -55,6 +55,9 @@ export default function RootLayout({
                   <NextLink className="nav-link" href="/account">
                     Account
                   </NextLink>
+                  <NextLink className="nav-link" href="/integrations">
+                    Integrations
+                  </NextLink>
                 </nav>
 
                 <div style={{ marginLeft: "auto" }}>

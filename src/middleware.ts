@@ -37,5 +37,11 @@ export default async function middleware(request: NextRequest) {
 
 // Match against the pages
 export const config = {
-  matcher: ["/", "/account/:path*", "/members/:path*", "/api/:path*"],
+  matcher: [
+    "/",
+    "/account/:path*",
+    "/members/:path*",
+    "/integrations/:path*",
+    "/api/:path*",
+  ],
 };
