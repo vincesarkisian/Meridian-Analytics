@@ -52,10 +52,13 @@ export default async function AccountPage() {
   const workspace = organizationName ?? organizationId ?? null;
 
   // Requirement 3: what this session can do, derived from its permissions.
+  // "Change a member's access" is governed by the User Management widget's
+  // `widgets:users-table:manage` permission (which admin + team-lead have), not our
+  // custom manage_roles — so the panel matches what the /members widget actually allows.
   const capabilities = [
     [PERMISSIONS.MEMBERS_READ, "View the member list"],
     [PERMISSIONS.MEMBERS_WRITE, "Invite and remove members"],
-    [PERMISSIONS.MEMBERS_MANAGE_ROLES, "Change a member's access"],
+    [PERMISSIONS.WIDGETS_USERS_TABLE_MANAGE, "Change a member's access"],
   ] as const;
 
   return (

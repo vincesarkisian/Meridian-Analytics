@@ -17,6 +17,13 @@ export const PERMISSIONS = {
   MEMBERS_WRITE: "members:write",
   /** Change a member's access (their role). */
   MEMBERS_MANAGE_ROLES: "members:manage_roles",
+  /**
+   * WorkOS's built-in permission for the User Management widget. It governs the
+   * widget's per-member actions — including changing a member's role — so it's the
+   * permission that actually decides who can change access in the app. Admin and
+   * team-lead have it; compliance does not.
+   */
+  WIDGETS_USERS_TABLE_MANAGE: "widgets:users-table:manage",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
