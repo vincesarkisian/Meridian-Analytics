@@ -1,4 +1,8 @@
-import { authkit, handleAuthkitHeaders } from "@workos-inc/authkit-nextjs";
+import {
+  authkit,
+  handleAuthkitHeaders,
+  getWorkOS,
+} from "@workos-inc/authkit-nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import {
   SESSION_STARTED_COOKIE,
@@ -21,11 +25,15 @@ export default async function middleware(request: NextRequest) {
       request.cookies.get(SESSION_STARTED_COOKIE)?.value,
     )
   ) {
-    // Clear the AuthKit session cookies so the user must sign in again. We KEEP
-    // the sign-in-time marker: a fresh sign-in overwrites it, and keeping it means
-    // a session that survives (e.g. a lingering refresh token) is still treated as
-    // expired rather than silently un-enforced.
-    const response = NextResponse.redirect(new URL("/", request.url));
+    // End the WorkOS session (not just the local cookie) so the user can't be
+    // silently re-authenticated from a still-valid WorkOS session — that silent
+    // re-auth is what was resetting the sign-in marker and defeating the limit.
+    const response = NextResponse.redirect(
+      getWorkOS().userManagement.getLogoutUrl({
+        sessionId: session.sessionId,
+        returnTo: request.nextUrl.origin,
+      }),
+    );
     const expire = { path: "/" as const, maxAge: 0, sameSite: "lax" as const };
     response.cookies.set("wos-session", "", expire);
     response.cookies.set("workos-access-token", "", expire);
