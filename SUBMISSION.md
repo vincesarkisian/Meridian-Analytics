@@ -70,6 +70,10 @@ How you worked with AI on this engagement. Be specific: name files, prompts, and
      `example.com` domain quirks.
   3. Reordered the build so **RBAC (permissions) landed before the widgets**, so the
      `/members` page could be permission-gated from the start rather than retrofitted.
+  4. Built a full **app-level admin-only MFA** flow (WorkOS MFA API + a custom `/mfa`
+     enroll/challenge screen, scoped to Prospect admins), then **cut it**. It duplicates
+     WorkOS's hosted MFA, double-prompts when the org policy is also on, and means owning an
+     MFA UI. Shipped the native org-wide policy instead and kept the tradeoff as pushback (§5).
 
 - **The prompt or technique that paid off most**: installing the WorkOS skills and then
   **grounding every dashboard step against the real dashboard in the browser** instead of
@@ -77,10 +81,14 @@ How you worked with AI on this engagement. Be specific: name files, prompts, and
   the "check permissions not slugs" rule, and the fact that per-org session length isn't a
   native toggle — all before writing code.
 
-- **The worst thing the AI gave you**: the initial session-expiry middleware (above) — a
-  subtle correctness bug that only appeared under refresh-token re-establishment. It also
-  didn't anticipate that the browser widgets need the app origin allowlisted as a **CORS
-  origin**, which cost a debug cycle when the members table wouldn't load.
+- **The worst thing the AI gave you**: the per-org session limit _looked_ done but had a
+  subtle hole. It correctly detected expiry and cleared the local cookie — but the WorkOS
+  session was still alive, so AuthKit **silently re-authenticated** the user and reset the
+  window, making the timeout look ignored. I only caught it by adding debug logging to the
+  middleware and watching a fresh sign-in marker reappear right after each expiry; the fix
+  was to end the WorkOS session via `getLogoutUrl`, not just wipe the cookie. (It also didn't
+  anticipate the browser widgets needing the app origin allowlisted as a **CORS origin** —
+  another debug cycle when the members table wouldn't load.)
 
 ## 5. Pushback
 
