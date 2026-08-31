@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# Claude Code working files (internal, not part of the deliverable)
+.claude/
+CLAUDE.md
+NOTES.md
