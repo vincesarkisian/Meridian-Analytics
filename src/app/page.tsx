@@ -24,7 +24,7 @@ export default async function HomePage() {
             Sign in
           </a>
           <NextLink className="btn btn-secondary" href="/login/sso">
-            Enterprise SSO (Acme)
+            Enterprise SSO
           </NextLink>
         </div>
       )}
