@@ -8,7 +8,7 @@ Deployed URL, repo, and demo video.
 
 - **Deployed app**: https://meridian-analytics-chi.vercel.app
 - **Repo**: https://github.com/vincesarkisian/Meridian-Analytics
-- **Video**: _(pending)_
+- **Video**: https://screen.studio/share/VjkLc8kE
 
 ## 2. Test credentials
 
