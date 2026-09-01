@@ -38,3 +38,6 @@ next-env.d.ts
 .claude/
 CLAUDE.md
 NOTES.md
+
+# Demo script (personal, not part of the deliverable)
+script.md
